@@ -33,13 +33,7 @@ Here’s a preview of the app interface:
 ![App Screenshot 1](agent_process.png)  
 ![App Screenshot 2](recommendation.png)  
 
----
-
-## 🚀 Try it out here:  
-👉 **[CineMate - Movie Recommendation App](#)**  
-
-🍿 Sit back, grab some popcorn, and let **CineMate** recommend your next watch! 🎥🎞️  
-
+🍿 Sit back, grab some popcorn, and let **CineMate** recommend your next watch! 🎥🎞️ 
 ---
 
 ## 💻 How to Run This Project Locally 🚀  
