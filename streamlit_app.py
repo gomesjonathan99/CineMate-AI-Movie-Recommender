@@ -14,19 +14,11 @@ st.set_page_config(
     layout="wide"
 )
 
-
 st.markdown("""
 <style>
-    .main {
-        background-color: #0e1117;
-    }
-    .stApp {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    h1, h2, h3 {
-        color: #f0f0f0;
-    }
+    .main { background-color: #0e1117; }
+    .stApp { max-width: 1200px; margin: 0 auto; }
+    h1, h2, h3 { color: #f0f0f0; }
     .recommendation {
         background-color: #1e2130;
         border-radius: 10px;
@@ -39,61 +31,62 @@ st.markdown("""
 st.title("🎬 Movie Recommendation App")
 st.markdown("Discover your next favorite movie based on your preferences!")
 
+# Sidebar for API Configuration
 with st.sidebar:
     st.header("API Configuration")
-    st.markdown("[Get Exa API Key](# API Playground URL: https://dashboard.exa.ai/playground) 🔑")
+    st.markdown("[🔑 Get Exa API Key](https://dashboard.exa.ai/playground)")
     exa_api_key = st.text_input("Exa API Key", type="password")
 
-    st.markdown("[Get Groq API Key](# GROQ API Key: https://console.groq.com/keys) 🔑")
+    st.markdown("[🔑 Get Groq API Key](https://console.groq.com/keys)")
     groq_api_key = st.text_input("Groq API Key", type="password")
-    
+
     st.header("Model Settings")
-    model_name = st.selectbox(
-        "Select Model",
-        ["mixtral-8x7b-32768"],
-        index=0
-    )
-    
+    model_name = st.selectbox("Select Model", ["mixtral-8x7b-32768"], index=0)
+
     st.header("About")
     st.markdown("""
-    This app uses AI to recommend movies based on your preferences. 
-    It leverages Groq for the language model and Exa for search capabilities.
-    
-    Enter your preferences, and the AI will suggest personalized movie recommendations!
+    This app uses AI to recommend movies based on your preferences.  
+    It leverages **Groq** for the language model and **Exa** for search capabilities.  
+    Enter your preferences, and the AI will suggest **personalized movie recommendations!** 🎥
     """)
 
-st.header("Enter Your Movie Preferences")
-
+# User input section
+st.header("🎥 Enter Your Movie Preferences")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    favorite_movies = st.text_area("Your favorite movies (comma separated)", 
-                                 placeholder="e.g., The Godfather, Inception, The Shawshank Redemption")
+    favorite_movies = st.text_area(
+        "Your favorite movies (comma separated)", 
+        placeholder="e.g., The Godfather, Inception, The Shawshank Redemption"
+    )
+    
     preferred_genres = st.multiselect(
         "Preferred Genres",
         ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", 
          "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Sci-Fi", "Thriller"],
         []
     )
-    
+
 with col2:
     mood = st.selectbox(
         "Current Mood",
         ["Any", "Happy", "Thoughtful", "Excited", "Relaxed", "Nostalgic", "Inspired"],
         index=0
     )
-    
+
     decade_options = ["Any"] + [f"{i}s" for i in range(1920, 2030, 10)]
     preferred_decade = st.selectbox("Preferred Decade", decade_options, index=0)
 
-additional_preferences = st.text_area("Any Additional Preferences", 
-                                    placeholder="e.g., foreign films, specific directors, themes, or elements you're looking for")
+additional_preferences = st.text_area(
+    "Any Additional Preferences", 
+    placeholder="e.g., foreign films, specific directors, themes, or elements you're looking for"
+)
 
-
+# Function to get movie recommendations
 def get_movie_recommendations(query_text):
     if not exa_api_key or not groq_api_key:
-        st.error("Please provide both Exa and Groq API keys in the sidebar.")
+        st.error("❌ Please provide both Exa and Groq API keys in the sidebar.")
         return None
     
     movie_recommendation_agent = Agent( 
@@ -102,110 +95,87 @@ def get_movie_recommendations(query_text):
         tools=[ExaTools(api_key=exa_api_key)],
         description=dedent(
             """
-            🎬 You are a **Movie Recommendation Agent**! Your mission is to help users discover their next favorite movies based on their preferences.  
+            🎬 You are a **Movie Recommendation Agent**!  
+            Your mission is to help users discover their next favorite movies.  
 
-            🎥 **Your Role as a Movie Expert**  
-            - Analyze user preferences to recommend **personalized movie suggestions**.  
-            - Curate recommendations using a mix of **classic hits, hidden gems, and trending movies**.  
-            - Ensure each suggestion is **relevant, diverse, and highly rated**.  
-            - Provide **up-to-date information**, including cast, director, runtime, and content advisory.  
-            - Highlight **where to watch** and suggest **upcoming releases**.  
+            ### Your Role as a Movie Expert  
+            - 🎥 **Analyze user preferences** to recommend personalized movies.  
+            - 🎭 **Curate a mix of classics, hidden gems, and trending titles.**  
+            - ⭐ Focus on **highly-rated** (7.5+ IMDb) and relevant films.  
+            - ⏳ Provide **runtime, cast, director, and content advisory**.  
+            - 📌 Mention **streaming availability & upcoming releases**.  
 
-            🍿 **Your Recommendations Should Include:**  
-            - 🎞️ **Title & Release Year**  
-            - 🎭 **Genre & Subgenres** (with emoji indicators)  
-            - ⭐ **IMDb Rating** (Focus on 7.5+ rated films)  
-            - ⏳ **Runtime & Primary Language**  
-            - 📖 **Engaging Plot Summary**  
-            - ⚠️ **Content Advisory / Age Rating**  
-            - 🎬 **Notable Cast & Director**  
-
-            📌 **Presentation Guidelines:**  
-            - Use **clear Markdown formatting** for better readability.  
-            - Organize recommendations in a **structured table**.  
-            - **Group similar movies together** for better discovery.  
-            - Provide **at least 5 personalized recommendations per query**.  
-            - Offer a **brief explanation** for why each movie was selected.  
+            ### Formatting Guidelines  
+            - Use **clear Markdown formatting** 📜.  
+            - Present **structured movie recommendations** (Title, Year, Genre, IMDb rating, etc.).  
+            - Provide at least **5 personalized recommendations** per query.  
             """
         ),
         instructions=dedent(
             """
-            ## 🎬 Approach for Generating Recommendations
+            ## 🎬 How to Recommend Movies  
 
-            ### 1. **Analysis Phase**
-            - Interpret user preferences based on input.
-            - Analyze favorite movies for themes, styles, and patterns.
-            - Consider specific user requirements (e.g., genre, rating, language, mood).
+            **1️⃣ Analyze User Preferences**  
+            - Extract themes, styles, and genres from input.  
+            - Identify trending & classic movies that match.  
 
-            ### 2. **Search & Curation**
-            - Utilize Exa to search for relevant movie options.
-            - Ensure variety in recommendations (mix of classics, hidden gems, and trending titles).
-            - Verify that movie details are up-to-date and accurate.
+            **2️⃣ Curate a Balanced List**  
+            - Use **Exa** to find relevant movies.  
+            - Ensure a mix of genres & styles.  
 
-            ### 3. **Detailed Information for Each Recommendation**
-            Each movie recommendation should include:
-            - 🎞️ **Title & Release Year**  
-            - 🎭 **Genre & Subgenres** (with emoji indicators)  
-            - ⭐ **IMDb Rating** (Focus on 7.5+ rated films)  
-            - ⏳ **Runtime & Primary Language**  
-            - 📖 **Brief, Engaging Plot Summary**  
-            - ⚠️ **Content Advisory / Age Rating**  
+            **3️⃣ Provide Detailed Information**  
+            Each movie should include:  
+            - 🎞️ **Title & Year**  
+            - 🎭 **Genre & IMDb Rating**  
+            - ⏳ **Runtime & Language**  
+            - 📖 **Engaging Plot Summary**  
             - 🎬 **Notable Cast & Director**  
+            - ⚠️ **Content Advisory**  
 
-            ### 4. **Additional Features**
-            - Include official trailers when available.
-            - Suggest upcoming releases in similar genres.
-            - Mention streaming availability when possible.
-
-            ### 🎨 **Presentation Style**
-            - Format output using **clear Markdown structure**.
-            - Present **main recommendations in a structured table**.
-            - Group similar movies together for **easy browsing**.
-            - Use **emoji indicators** to visually represent genres (e.g., 🎭 *Drama*, 🎬 *Action*, 🎪 *Adventure*).
-            - Provide a **minimum of 5 recommendations per query**.
-            - Offer a **brief explanation** of why each movie was recommended.
+            **4️⃣ Format Recommendations Clearly**  
+            - Use bullet points & emojis.  
+            - Provide a **minimum of 5 recommendations**.  
             """
         ),
         markdown=True,
     )
     
-    # Generate response using the run method instead of generate
     response = movie_recommendation_agent.run(query_text)
     return response.content
 
-# Build the search query based on user inputs
+# Build query based on user input
 def build_query():
     query_parts = []
     
     if favorite_movies:
-        query_parts.append(f"I like movies such as {favorite_movies}")
+        query_parts.append(f"I like movies such as {favorite_movies}.")
     
     if preferred_genres:
         genres_str = ", ".join(preferred_genres)
-        query_parts.append(f"I prefer {genres_str} genres")
+        query_parts.append(f"I prefer {genres_str} genres.")
     
     if mood != "Any":
-        query_parts.append(f"I'm in a {mood.lower()} mood")
+        query_parts.append(f"I'm in a {mood.lower()} mood.")
     
     if preferred_decade != "Any":
-        query_parts.append(f"I prefer movies from the {preferred_decade}")
+        query_parts.append(f"I prefer movies from the {preferred_decade}.")
     
     if additional_preferences:
-        query_parts.append(additional_preferences)
+        query_parts.append(f"Additional preferences: {additional_preferences}")
     
-    return "Recommend movies based on these preferences: " + ". ".join(query_parts)
+    return "Recommend movies based on these preferences: " + " ".join(query_parts)
 
-# Search button
-if st.button("Get Movie Recommendations", type="primary"):
+# Generate movie recommendations
+if st.button("🎬 Get Movie Recommendations", type="primary"):
     if not favorite_movies and not preferred_genres and not additional_preferences:
-        st.warning("Please provide some movie preferences for better recommendations.")
+        st.warning("⚠️ Please provide some movie preferences for better recommendations.")
     else:
         query = build_query()
         
-        with st.spinner("Agent 🤖 isFinding the perfect movies for you..."):
-            st.info(f"Searching for: {query}")
+        with st.spinner("🤖 Finding the perfect movies for you..."):
+            st.info(f"🔍 Searching for: {query}")
             
-            # Get recommendations
+            # Fetch recommendations
             with st.container():
                 recommendations = get_movie_recommendations(query)
                 if recommendations:
@@ -213,11 +183,10 @@ if st.button("Get Movie Recommendations", type="primary"):
                     st.markdown(recommendations)
                     st.markdown("---")
                     st.download_button(
-                        label="Download Recommendations",
+                        label="⬇️ Download Recommendations",
                         data=recommendations,
                         file_name="movie_recommendations.md",
                         mime="text/markdown",
                     )
-
 
 st.markdown("---")
