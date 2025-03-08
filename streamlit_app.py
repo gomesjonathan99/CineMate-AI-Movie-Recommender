@@ -41,8 +41,11 @@ st.markdown("Discover your next favorite movie based on your preferences!")
 
 with st.sidebar:
     st.header("API Configuration")
-    exa_api_key = st.text_input("Exa API Key", value=os.getenv("EXA_API_KEY", ""), type="password")
-    groq_api_key = st.text_input("Groq API Key", value=os.getenv("GROQ_API_KEY", ""), type="password")
+    st.markdown("[Get Exa API Key](# API Playground URL: https://dashboard.exa.ai/playground) 🔑")
+    exa_api_key = st.text_input("Exa API Key", type="password")
+
+    st.markdown("[Get Groq API Key](# GROQ API Key: https://console.groq.com/keys) 🔑")
+    groq_api_key = st.text_input("Groq API Key", type="password")
     
     st.header("Model Settings")
     model_name = st.selectbox(
