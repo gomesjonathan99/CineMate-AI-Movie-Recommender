@@ -2,3 +2,4 @@ flask
 agno
 python-dotenv
 openai
+groq
