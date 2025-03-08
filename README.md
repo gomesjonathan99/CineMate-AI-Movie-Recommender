@@ -15,8 +15,7 @@ It uses **Groq LLM** for intelligent language processing and **Exa Search API** 
 
 ✅ **Powered by AI**: Uses **Groq LLM** and **Exa Search API** for intelligent and fast recommendations.  
 
-✅ **Detailed Movie Information**:  
-- ⭐ **IMDb Rating**  
+✅ **Detailed Movie Information**:   
 - 🎞 **Plot Summary**  
 - ⏱ **Runtime**  
 - 🎬 **Director & Cast**  
